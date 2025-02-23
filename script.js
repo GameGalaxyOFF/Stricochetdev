@@ -1,3 +1,3 @@
 document.addEventListener("DOMContentLoaded", function() {
-    alert("Bienvenue sur Mon Site Netflix !");
+    document.querySelector(".hero-content").style.opacity = "1";
 });
