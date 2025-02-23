@@ -64,11 +64,8 @@
         <div class="info">⏳ Durée : 1h40</div>
         <div class="info">🌟 Note : 7.8/10</div>
         <div class="info">🔹 Genres : Action, Science-fiction, Comédie</div>
-        <div style="padding:56.25% 0 0 0;position:relative;">
-            <iframe width="100%" height="100%" src="https://app.videas.fr/embed/media/e854883e-2bfc-4097-9a73-3606e17b59c6/" 
-                    frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen="true" style="position: absolute; top: 0; left: 0" referrerpolicy="unsafe-url"></iframe>
-        </div>
+        <div style="padding:56.25% 0 0 0;position:relative;"><iframe width="100%" height="100%" src="https://app.videas.fr/embed/media/e854883e-2bfc-4097-9a73-3606e17b59c6/" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="true" style="position: absolute; top: 0; left: 0" referrerpolicy="unsafe-url"></iframe></div>
+        <div class="info">👍 Likes : <span id="like-count">0</span> | 👎 Dislikes : <span id="dislike-count">0</span></div>
         <div class="buttons">
             <button id="like-button" class="like-button" onclick="vote('like')">👍 Like</button>
             <button id="dislike-button" class="dislike-button" onclick="vote('dislike')">👎 Dislike</button>
@@ -76,23 +73,43 @@
     </div>
 
     <script>
+        function updateCounts() {
+            document.getElementById('like-count').textContent = localStorage.getItem('globalLikes') || 0;
+            document.getElementById('dislike-count').textContent = localStorage.getItem('globalDislikes') || 0;
+        }
+
         function vote(type) {
-            if (!localStorage.getItem('userVote')) {
-                localStorage.setItem('userVote', type);
-                document.getElementById('like-button').classList.toggle('active', type === 'like');
-                document.getElementById('dislike-button').classList.toggle('active', type === 'dislike');
+            let userVote = localStorage.getItem('userVote');
+            let likes = parseInt(localStorage.getItem('globalLikes') || 0);
+            let dislikes = parseInt(localStorage.getItem('globalDislikes') || 0);
+
+            if (userVote === type) {
+                localStorage.removeItem('userVote');
+                if (type === 'like') likes = Math.max(0, likes - 1);
+                if (type === 'dislike') dislikes = Math.max(0, dislikes - 1);
             } else {
-                alert("Vous avez déjà voté !");
+                if (userVote === 'like') likes = Math.max(0, likes - 1);
+                if (userVote === 'dislike') dislikes = Math.max(0, dislikes - 1);
+                localStorage.setItem('userVote', type);
+                if (type === 'like') likes++;
+                if (type === 'dislike') dislikes++;
             }
+
+            localStorage.setItem('globalLikes', likes);
+            localStorage.setItem('globalDislikes', dislikes);
+            updateButtonState();
+            updateCounts();
+        }
+
+        function updateButtonState() {
+            let voteType = localStorage.getItem('userVote');
+            document.getElementById('like-button').classList.toggle('active', voteType === 'like');
+            document.getElementById('dislike-button').classList.toggle('active', voteType === 'dislike');
         }
 
         window.onload = function() {
-            let voteType = localStorage.getItem('userVote');
-            if (voteType === 'like') {
-                document.getElementById('like-button').classList.add('active');
-            } else if (voteType === 'dislike') {
-                document.getElementById('dislike-button').classList.add('active');
-            }
+            updateButtonState();
+            updateCounts();
         }
     </script>
 </body>
